@@ -1,15 +1,20 @@
 import random
-import abc
+
+from mastermind.user import Player
+from mastermind.view import View
 
 class Game:
     def __init__(self, user, view) -> None:
-        self.solution_length: int = 4 # à changer
+        self.max_tries:int       = 8
+        self.solution_length:int = 2 # à changer
+        self.game_has_ended:bool = False
         self.solution: list[int] = self.create_solution()
-        self.tries: list[dict] = []
-        self.max_tries = 8
-        self.game_has_ended = False
-        self.user = user
-        self.view = view(self.solution_length, self.max_tries)
+
+        self.tries:list[dict] = []
+        
+        self.user:Player = user
+        self.view:View   = view(self.solution_length, self.max_tries)
+
 
     def create_solution(self):
         possibilities = [i for i in range(8)]
@@ -20,6 +25,10 @@ class Game:
             solution.append(possibilities[index])
             possibilities.pop(index)
         return solution
+
+
+    def reset(self):
+        pass
 
 
     def user_submition(self, user_input):
@@ -61,7 +70,7 @@ class Game:
         '''
         check le dernier items de self.tries et regarde si check{well_placed} == self.solution_length
         '''
-        return self.solution if self.tries[-1]["check"]["well_placed"] == 4 else False
+        return self.solution if self.tries[-1]["check"]["well_placed"] == self.solution_length else False
 
 
     def has_user_lost(self):
@@ -78,7 +87,7 @@ class Game:
         if not all(isinstance(x, int) for x in inp):
             return False, "Inputs should be integers"
 
-        if not all(-1 < x < 8 for x in inp):
+        if any(0 > x > 7 for x in inp):
             return False, "Inputs should be in [0, 7]"
 
         # doublons
@@ -104,3 +113,6 @@ class Game:
             if game_state[0] != 0:
                 self.game_has_ended = True
                 self.view.display_end(self.tries, self.solution, game_state)
+        
+            # game has ended
+            # self.view.display_replay()

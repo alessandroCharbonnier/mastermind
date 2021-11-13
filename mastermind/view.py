@@ -25,7 +25,7 @@ class ViewTerminal(View):
     def display_grid(self, state):
         print("+" + "---" * self.solution_length + "+")
         for i in range(self.max_tries-1, -1, -1):
-            a = [" "]*4 if i >= len(state) else state[i]["guess"]
+            a = [" "]*self.solution_length if i >= len(state) else state[i]["guess"]
 
             line = "|"
             for e in a:
@@ -46,10 +46,11 @@ class ViewTerminal(View):
         print(error)
 
     def display_end(self, state, solution, game_state):
+        print("\n"*2)
         line = "|"
         for a in solution:
             line += f"[{a}]"
-        line += "|"
+        line += "| THE SOLUTION"
         print(line)
         self.display_grid(state)
         print(game_state[1])
