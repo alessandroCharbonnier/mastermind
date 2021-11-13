@@ -10,9 +10,18 @@ class Player:
 
 class HumanPlayer(Player):
     def __init__(self, nom) -> None:
-        super().__init__(self, nom)
+        super().__init__(nom)
 
     def play(self, game_state):
-        return input("Votre essaie : ")
+        user_input = input("Votre essaie : ")
+        return list(map(int, user_input.split()))
+
+import random
+class IdiotPlayer(Player):
+    def __init__(self, nom) -> None:
+        super().__init__(nom)
+
+    def play(self, game_state):
+        return [random.randint(0, 7) for _ in range(4)]
 
 
