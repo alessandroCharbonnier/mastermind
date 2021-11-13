@@ -16,6 +16,10 @@ class View:
     @abc.abstractclassmethod
     def display_error(self, error):
         raise NotImplementedError
+    
+    @abc.abstractclassmethod
+    def display_replay(self, error):
+        raise NotImplementedError
 
 
 class ViewTerminal(View):
