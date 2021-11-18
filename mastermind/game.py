@@ -2,33 +2,37 @@ import random
 
 from mastermind.user import Player
 from mastermind.view import View
+import signal
+
+def handler(signum, frame):
+    Game.exit()
+
+signal.signal(signal.SIGINT, handler)
 
 class Game:
     def __init__(self, user, view) -> None:
-        self.max_tries:int       = 8
-        self.solution_length:int = 2 # à changer
+        self.max_tries:int       = 12
+        self.solution_length:int = 4 # à changer
         self.game_has_ended:bool = False
         self.solution: list[int] = self.create_solution()
 
         self.tries:list[dict] = []
         
-        self.user:Player = user
+        self.user:Player = user(self.solution_length)
         self.view:View   = view(self.solution_length, self.max_tries)
 
 
     def create_solution(self):
-        possibilities = [i for i in range(8)]
-
-        solution = []
-        for _ in range(self.solution_length):
-            index = random.randint(0, len(possibilities)-1)
-            solution.append(possibilities[index])
-            possibilities.pop(index)
-        return solution
+        """
+        returns self.solution_length random elements of [0, 1, 2, 3, 4, 5, 6, 7]
+        """
+        return random.sample([i for i in range(8)], self.solution_length)
 
 
     def reset(self):
-        pass
+        self.game_has_ended = False
+        self.solution = self.create_solution()
+        self.tries = []
 
 
     def user_submition(self, user_input):
@@ -97,12 +101,13 @@ class Game:
         return True, None
 
     def play(self):
+        self.user.set_name(self.user.pick_name())
         self.view.display_state(self.tries)
         while not self.game_has_ended:
             user_input = None
             valid = False
             while not valid:
-                user_input = self.user.play(self.tries)
+                user_input = self.user.play(self.tries, self.solution)
                 a = self.validate_input(user_input)
                 valid = a[0]
                 error = a[1]
@@ -111,8 +116,17 @@ class Game:
             game_state = self.user_submition(user_input)
             self.view.display_state(self.tries)
             if game_state[0] != 0:
-                self.game_has_ended = True
                 self.view.display_end(self.tries, self.solution, game_state)
         
-            # game has ended
-            # self.view.display_replay()
+                # game has ended
+                replay_game = self.view.display_replay()
+                if replay_game:
+                    self.reset()
+                    self.view.display_state(self.tries)
+                else:
+                    self.exit()
+
+    @staticmethod
+    def exit():
+        print("\nSEE YOU!")
+        exit(0)
