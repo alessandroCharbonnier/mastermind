@@ -43,7 +43,7 @@ class ViewTerminal(View):
             line += '|'
             line += f'({state[i]["check"]["well_placed"]}, {state[i]["check"]["not_well_placed"]})' if i < len(state) else ''
             print(line)
-        print("+" + "---" * self.solution_length +"+")
+        print("+" + "---" * self.solution_length + "+")
 
 
     def display_state(self, state):
