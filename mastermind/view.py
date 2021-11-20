@@ -1,4 +1,5 @@
 import abc
+import arcade
 
 class View:
     def __init__(self, solution_length, max_tries) -> None:
@@ -23,6 +24,9 @@ class View:
         must be blocking
         """
         raise NotImplementedError
+    
+    def exit(self):
+        pass
 
 
 class ViewTerminal(View):
@@ -76,3 +80,30 @@ class ViewTerminal(View):
             return False
 
 
+class GView(View):
+    def __init__(self, solution_length, max_tries) -> None:
+        self.solution_length = solution_length
+        self.max_tries = max_tries
+        self.running = True
+        arcade.open_window(500, 500, 'le meilleur jeu de la terre fait par des bons pour des bons')
+        arcade.set_background_color(arcade.color.WHITE)
+    def display_state(self, state):
+        pass
+
+    def display_end(self, tries, solution, game_state):
+        pass
+
+    def display_error(self, error):
+        pass
+    
+    def display_replay(self):
+        """
+        must be blocking
+        """
+    
+    def draw(self):
+        pass
+    
+    def exit(self):
+        self.running = False
+        

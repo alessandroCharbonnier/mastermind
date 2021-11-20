@@ -1,18 +1,12 @@
 import random
 
 from mastermind.user import Player
-from mastermind.view import View
-import signal
-
-def handler(signum, frame):
-    Game.exit()
-
-signal.signal(signal.SIGINT, handler)
+from mastermind.view import GView, View
 
 class Game:
-    def __init__(self, user, view) -> None:
-        self.max_tries:int       = 12
-        self.solution_length:int = 4 # à changer
+    def __init__(self, user, view, tries=8, solution_length=4) -> None:
+        self.max_tries:int       = tries
+        self.solution_length:int = solution_length
         self.game_has_ended:bool = False
         self.solution: list[int] = self.create_solution()
 
@@ -30,6 +24,7 @@ class Game:
 
 
     def reset(self):
+        self.user.reset()
         self.game_has_ended = False
         self.solution = self.create_solution()
         self.tries = []
@@ -107,7 +102,7 @@ class Game:
             user_input = None
             valid = False
             while not valid:
-                user_input = self.user.play(self.tries, self.solution)
+                user_input = self.user.play(self.tries)
                 a = self.validate_input(user_input)
                 valid = a[0]
                 error = a[1]
@@ -126,7 +121,30 @@ class Game:
                 else:
                     self.exit()
 
-    @staticmethod
-    def exit():
+    def play_auto(self, total_runs=10_000):
+        nb_runs = 0
+        lost = 0
+        win  = 0
+        self.user.set_name(self.user.pick_name())
+        while not self.game_has_ended and nb_runs < total_runs:
+            user_input = None
+            valid = False
+            while not valid:
+                user_input = self.user.play(self.tries)
+                a = self.validate_input(user_input)
+                valid = a[0]
+            game_state = self.user_submition(user_input)
+            if game_state[0] != 0:
+                self.reset()
+                nb_runs += 1
+                if game_state[0] == 1:
+                    win += 1
+                elif game_state[0] == -1:
+                    lost += 1
+                print(nb_runs) if nb_runs % 100 == 0 else ''
+        print(f'{win=}, {lost=} : {lost/total_runs}%')
+
+    def exit(self):
+        self.view.exit()
         print("\nSEE YOU!")
         exit(0)
